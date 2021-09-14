@@ -2,6 +2,8 @@ var WebSocketServer = require('websocket').server;
 var http = require('http');
 
 const port = 3000;
+let client1;
+let client2;
 
 var server = http.createServer();
 server.listen(port, () => {
@@ -11,40 +13,37 @@ server.listen(port, () => {
 wsServer = new WebSocketServer({
     httpServer: server
 });
+
 wsServer.on('request', (request) => {
-    let state = false;
+    if (client1 == undefined) {
+        client1 = request.accept(null, request.origin);
+        console.log("Cliente 1 conectado!");
+    }
+    else {
+        client2 = undefined;
+        client2 = request.accept(null, request.origin);
+        console.log("Cliente 2 conectado!");
+    }
 
-    let client = request.accept(null, request.origin);
-
-    client.on('message', (message) => {
+    client1.on('message', (message) => {
         if (message.type === 'utf8') {
-            console.log(message.utf8Data);
+            const colorJSON = JSON.parse(message.utf8Data);
+            console.log(colorJSON);
+            if (client2 != undefined) {
+                client2.sendUTF(`{R: ${colorJSON["R"]}, G: ${colorJSON["G"]}, B: ${colorJSON["B"]}}`);
+            }
         }
     });
-    let r = 255, g = 0, b = 0;
-    let interval = setInterval(function () {
-        if (r > 0 && b == 0) {
-            r--;
-            g++;
-        }
-        if (g > 0 && r == 0) {
-            g--;
-            b++;
-        }
-        if (b > 0 && g == 0) {
-            r++;
-            b--;
-        }
-        //client.sendUTF(`{R: ${r}, G: ${g}, B: ${b}}`);
-        client.sendUTF(`{R: ${getRandom(0,255)}, G: ${getRandom(0,255)}, B: ${getRandom(0,255)}}`);
-    }, 100);
 
-    client.on('close', () => {
-        console.log("Conexão fechada");
-        clearInterval(interval);
+    client1.on('close', () => {
+        client1 = undefined;
+        console.log("Conexão fechada (Client 1)");
     });
+
+    if (client2 != undefined) {
+        client2.on('close', () => {
+            client2 = undefined;
+            console.log("Conexão fechada (Client 2)");
+        });
+    }
 });
-
-function getRandom(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-}
