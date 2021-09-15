@@ -2,48 +2,48 @@ var WebSocketServer = require('websocket').server;
 var http = require('http');
 
 const port = 3000;
-let client1;
-let client2;
 
 var server = http.createServer();
 server.listen(port, () => {
     console.log(`Server está executando na porta ${port}`);
 });
 
-wsServer = new WebSocketServer({
+var wsServer = new WebSocketServer({
     httpServer: server
 });
 
-wsServer.on('request', (request) => {
-    if (client1 == undefined) {
-        client1 = request.accept(null, request.origin);
-        console.log("Cliente 1 conectado!");
-    }
-    else {
-        client2 = undefined;
-        client2 = request.accept(null, request.origin);
-        console.log("Cliente 2 conectado!");
-    }
+var connections = [];
 
-    client1.on('message', (message) => {
+wsServer.on('request', (request) => {
+    if (!clientIdIsAllowed(request.resourceURL.query["clientId"])) {
+        request.reject();
+        console.log((new Date()) + ' Conexão rejeitada. Origem: ' + request.origin);
+        return;
+    }
+    var connection = request.accept(null, request.origin);
+
+    connections.push(connection);
+
+    console.log((new Date()) + ' Conexão aceita!');
+    //console.log(request.resourceURL.query["clientId"]);
+    connection.on('message', function (message) {
         if (message.type === 'utf8') {
-            const colorJSON = JSON.parse(message.utf8Data);
-            console.log(colorJSON);
-            if (client2 != undefined) {
-                client2.sendUTF(`{R: ${colorJSON["R"]}, G: ${colorJSON["G"]}, B: ${colorJSON["B"]}}`);
-            }
+            console.log('Mensagem recevida: ' + message.utf8Data);
+            connections.forEach((element) => {
+                element.sendUTF(message.utf8Data);
+            });
+        }
+        else {
+            console.log('A mensagem deve ser enviada em UTF-8');
         }
     });
-
-    client1.on('close', () => {
-        client1 = undefined;
-        console.log("Conexão fechada (Client 1)");
+    connection.on('close', function (reasonCode, description) {
+        console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' desconectado.');
     });
-
-    if (client2 != undefined) {
-        client2.on('close', () => {
-            client2 = undefined;
-            console.log("Conexão fechada (Client 2)");
-        });
-    }
 });
+
+function clientIdIsAllowed(clientId) {
+    if (clientId == 0 || clientId == 1) {
+        return true;
+    }
+}
