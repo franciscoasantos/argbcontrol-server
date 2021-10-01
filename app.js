@@ -1,10 +1,10 @@
-var WebSocketServer = require('websocket').server;
-var http = require('http');
-var moment = require('moment');
+import { server as WebSocketServer } from 'websocket';
+import { createServer } from 'http';
+import moment from 'moment';
 
 const port = 3000;
 
-let server = http.createServer();
+let server = createServer();
 server.listen(port, () => {
     log(`Server está executando na porta ${port}`);
 });
