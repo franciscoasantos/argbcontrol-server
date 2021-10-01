@@ -1,12 +1,25 @@
 {
   "name": "ledcontroller-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "LedController Server-side",
   "main": "app.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/franciscoasantos/LedController.git"
+  },
+  "author": "@franciscoasantos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/franciscoasantos/LedController/issues"
+  },
+  "homepage": "https://github.com/franciscoasantos/LedController#readme",
+  "dependencies": {
+    "moment": "^2.29.1",
+    "nodemon": "^2.0.13",
+    "websocket": "^1.0.34"
+  }
 }
