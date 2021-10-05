@@ -8,7 +8,7 @@ function createWebSocket(httpServer) {
 
     function start() {
         log('websocketserver', 'Iniciando servidor webSocket...');
-        lastColor = '{"M": "0", "R": "10", "G": "0", "B": "0"}';
+        lastColor = '0A00'; //R: 10, G: 0, B: 0
 
         wsServer.on('request', (request) => {
             if (!clientIdIsAllowed(request.resourceURL.query["clientId"])) {
@@ -25,7 +25,7 @@ function createWebSocket(httpServer) {
 
             connection.on('message', function (message) {
                 if (message.type === 'utf8') {
-                    lastColor = message.utf8Data;
+                    lastColor = getHexColor(JSON.parse(message.utf8Data));
                     log('websocketserver', 'Mensagem recebida: ' + lastColor);
                     connections.forEach((element) => {
                         element.sendUTF(lastColor);
@@ -52,6 +52,10 @@ function createWebSocket(httpServer) {
     function stop() {
         log('websocketserver', 'Parando servidor webSocket...')
         wsServer.closeAllConnections();
+    }
+
+    function getHexColor(message){
+        return '0' + parseInt(message['R']).toString(16).padStart(2,'0') + parseInt(message['G']).toString(16).padStart(2,'0') + parseInt(message['B']).toString(16).padStart(2,'0')
     }
 
     return {
