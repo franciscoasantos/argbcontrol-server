@@ -37,8 +37,13 @@ function createWebSocket(httpServer) {
             });
 
             connection.on('close', function (reasonCode, description) {
-                log('websocketserver', 'Peer ' + connection.remoteAddress + ' desconectado.');
-                connections = connections.filter((element) => { element != connection });
+                log('websocketserver', 'Peer ' + connection.remoteAddress + ' desconectado. ReasonCode: ' + reasonCode + ' Description: ' + description);
+                connections = connections.filter(filterConnections);
+                function filterConnections(item){
+                    if (item.connected == true){
+                        return item;
+                    }
+                }
             });
         });
 
