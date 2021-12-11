@@ -8,7 +8,7 @@ function createWebSocket(httpServer) {
 
     function start() {
         log('websocketserver', 'Iniciando servidor webSocket...');
-        lastColor = '0010000000'; //R: 10, G: 0, B: 0
+        lastColor = '1255000000'; //R: 10, G: 0, B: 0
 
         wsServer.on('request', (request) => {
             if (!clientIdIsAllowed(request.resourceURL.query["clientId"])) {
@@ -60,7 +60,7 @@ function createWebSocket(httpServer) {
     }
 
     function getMessageColor(message){
-        return '0' + parseInt(message['R']).toString().padStart(3,'0') + parseInt(message['G']).toString().padStart(3,'0') + parseInt(message['B']).toString().padStart(3,'0')
+        return parseInt(message['M']).toString() + parseInt(message['R']).toString().padStart(3,'0') + parseInt(message['G']).toString().padStart(3,'0') + parseInt(message['B']).toString().padStart(3,'0')
     }
 
     return {
