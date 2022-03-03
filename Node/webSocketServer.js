@@ -8,7 +8,7 @@ function createWebSocket(httpServer) {
 
     function start() {
         log('websocketserver', 'Iniciando servidor webSocket...');
-        lastColor = '1255000000'; //R: 10, G: 0, B: 0
+        lastColor = '1012000000'; //R: 10, G: 0, B: 0
 
         wsServer.on('request', (request) => {
             if (!clientIdIsAllowed(request.resourceURL.query["clientId"])) {
@@ -39,8 +39,8 @@ function createWebSocket(httpServer) {
             connection.on('close', function (reasonCode, description) {
                 log('websocketserver', 'Peer ' + connection.remoteAddress + ' desconectado. ReasonCode: ' + reasonCode + ' Description: ' + description);
                 connections = connections.filter(filterConnections);
-                function filterConnections(item){
-                    if (item.connected == true){
+                function filterConnections(item) {
+                    if (item.connected == true) {
                         return item;
                     }
                 }
@@ -59,8 +59,14 @@ function createWebSocket(httpServer) {
         wsServer.closeAllConnections();
     }
 
-    function getMessageColor(message){
-        return parseInt(message['M']).toString() + parseInt(message['R']).toString().padStart(3,'0') + parseInt(message['G']).toString().padStart(3,'0') + parseInt(message['B']).toString().padStart(3,'0')
+    function getMessageColor(message) {
+
+        switch (parseInt(message['M'])) {
+            case 0:
+                return parseInt(message['M']).toString() + parseInt(message['R']).toString().padStart(3, '0') + parseInt(message['G']).toString().padStart(3, '0') + parseInt(message['B']).toString().padStart(3, '0')
+            case 1:
+                return message['M'] + message['A']
+        }
     }
 
     return {
