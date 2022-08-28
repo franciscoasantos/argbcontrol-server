@@ -65,6 +65,7 @@ function createWebSocket(httpServer) {
             case 0:
                 return parseInt(message['M']).toString() + parseInt(message['R']).toString().padStart(3, '0') + parseInt(message['G']).toString().padStart(3, '0') + parseInt(message['B']).toString().padStart(3, '0')
             case 1:
+            case 2:
                 return message['M'] + message['A']
         }
     }
